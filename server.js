@@ -1,5 +1,8 @@
 const express = require('express');
 var pdfFillForm = require('pdf-fill-form');
+var PDFLib = require('pdf-lib')
+const { PDFDocument, rgb, StandardFonts } = PDFLib
+const { writeFileSync, readFileSync } = require("fs");
 var fs = require('fs');
 
 const app = express();
@@ -22,11 +25,31 @@ var pdf = pdfFillForm.writeSync('input.pdf',
   }, function(err) {
     console.log(err);
   });
+  modifyPDF()
 });
 
-// app.get('/', function (req, res) {
-//   res.sendFile(path.join(__dirname,'public', 'index.html'));
-// });
+// pdf-lib package if we don't have field form id in pdf 
+
+async function modifyPDF() {
+  const document = await PDFDocument.load(readFileSync("./Certificate.pdf"));
+
+  const courierBoldFont = await document.embedFont(StandardFonts.Courier);
+  const firstPage = document.getPage(0);
+  const { width, height } = firstPage.getSize()
+  const bc_id = "23jh23h4kdFG322324FDg3232"
+
+  firstPage.moveTo(width - 300, height- height + 30);
+  firstPage.drawText('Token: ' + bc_id, {
+    font: courierBoldFont,
+    size: 12,
+    lineHeight: 10,
+  });
+
+  writeFileSync("with_hash.pdf", await document.save());
+}
+
+modifyPDF().catch((err) => console.log(err));
+
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
