@@ -22,7 +22,7 @@ var pdf = pdfFillForm.writeSync('input.pdf',
   }, function(err) {
     console.log(err);
   });
-});filled_test
+});
 
 // app.get('/', function (req, res) {
 //   res.sendFile(path.join(__dirname,'public', 'index.html'));
